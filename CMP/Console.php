@@ -30,26 +30,22 @@ class Console {
       
       if (is_null($command)) return FALSE;
 
-      $opts = $command->getOptionCollection();
+      $optcll = $command->getOptionCollection();
 
-      $args = $opts->dump();
+      $opts = $optcll->dump();
 
-      if (!empty($args['c']))
-         unset($args['c']);
-
-      if (!empty($args['command']))
-         unset($args['command']);
+      $args = getopt($opts['options'], $opts['longopts']);
 
       return $command->execute($this, $args);
       
    }
 
-   public function write($text, $color = NULL) {
-      echo !is_null($color) ? ConsoleUtils::setColor($text, $color) : $text;
+   public function write($text, $color = NULL, $nl = FALSE) {
+      echo (!is_null($color) ? ConsoleUtils::setColor($text, $color) : $text).PHP_EOL;
    }
 
    public function writeln($text, $color = NULL) {
-      $this->write($text.PHP_EOL, $color);
+      $this->write($text, $color, TRUE);
    }
 
    public function read($text = '') {
