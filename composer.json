@@ -1,0 +1,23 @@
+{
+    "name": "kaduamaral/cmp",
+    "description": "A PHP Command Line Tool",
+    "type": "library",
+    "keywords": ["cli","command", "line", "command line"],
+    "homepage": "https://github.com/KaduAmaral/cmp",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Carlos Barcelos",
+            "email": "carlos.barcelos@outlook.com",
+            "homepage": "http://devcia.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.33"
+    },
+    "autoload": {
+        "classmap": ["CMP.php", "Command.php"]
+    }
+    
+}
