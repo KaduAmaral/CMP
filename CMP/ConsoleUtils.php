@@ -35,7 +35,11 @@ class ConsoleUtils {
    }
 
    public static function setText($text, $foreground = 37, $style = 0, $background = 40) {
-      return "\033[{$style};{$foreground};{$background}m{$text}\033[0m";
+      return self::canColorize() ? "\x1b[{$style};{$foreground};{$background}m{$text}\x1b[0m" : $text;
+   }
+
+   private static function canColorize() {
+      return strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
    }
 
 }
