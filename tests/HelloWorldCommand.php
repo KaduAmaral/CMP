@@ -1,18 +1,22 @@
 <?php
 namespace tests;
 
-use \CMP\Command;
+use \CMP\Command\Command;
 use \CMP\Console;
-use \CMP\ConsoleUtils;
+use \CMP\ConsoleOutput\FormatterStyle;
 
 class HelloWorldCommand extends Command {
 
    public function execute(Console $console, $args = []) {
-      $console->writeln("Hello World", ConsoleUtils::FG_BLUE);
+      $console->writeln("<red>Hellow {$args['--who']}</red>");
    }
 
    public function getOptionCollection() {
-      return new \CMP\OptionCollection;
+      $cl = new \CMP\Command\OptionCollection;
+
+      $cl->add('w|who:?', 'Quem receberá o Olá?', 'World');
+
+      return $cl;
    }
 
 }

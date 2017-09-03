@@ -2,18 +2,20 @@
 
 namespace CMP;
 
-use \CMP\CommandCollection;
-use \CMP\Command;
-use \CMP\ConsoleUtils;
+use \CMP\Command\CommandCollection;
+use \CMP\Command\Command;
+use \CMP\ConsoleOutput\Formatter;
 
 use \Exception;
 
 class Console {
    
    private $commands;
+   private $formatter;
 
    public function __construct() {
       $this->commands = new CommandCollection();
+      $this->formatter = new Formatter(TRUE);
    }
 
    public function register($name, Command $command) {
@@ -26,22 +28,41 @@ class Console {
 
    public function run() {
       
-      $command = $this->getCommand();
+      // $command = $this->getCommand();
       
-      if (is_null($command)) return FALSE;
+      // if (is_null($command)) return FALSE;
 
-      $optcll = $command->getOptionCollection();
+      // $optcll = $command->getOptionCollection();
 
-      $opts = $optcll->dump();
+      // $opts = $optcll->dump();
 
-      $args = getopt($opts['options'], $opts['longopts']);
+      // $args = getopt($opts['options'], $opts['longopts']);
 
-      return $command->execute($this, $args);
+      $doc = $this->commands->dump();
+
+      $docopt = \Docopt::handle($doc);
+
+      //  var_dump($docopt);
+
+      if (!empty($docopt->args)) {
+         reset($docopt->args);
+         $cname = key($docopt->args);
+         $command = $this->commands->get($cname);
+         
+         if ($command instanceof Command)
+            $command->execute($this, $docopt->args);
+         else $this->writeln('<error>Command not found</error>'); 
+      } else $this->writeln('<error>Command not found</error>');
+
+      //var_dump($args2);
+
+      // return $command->execute($this, $args);
       
    }
 
    public function write($text, $color = NULL, $nl = FALSE) {
-      echo (!is_null($color) ? ConsoleUtils::setColor($text, $color) : $text).PHP_EOL;
+      $text = $this->formatter->format($text);
+      echo $text.($nl?PHP_EOL:'');
    }
 
    public function writeln($text, $color = NULL) {
