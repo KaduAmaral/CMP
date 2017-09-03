@@ -7,7 +7,7 @@ use \CMP\Command\Option;
 class OptionCollection {
    private $options = [];
 
-   public function add($option, $description) {
+   public function add($option, $description, $default = NULL) {
       $p = $this->parseOption($option);
       $o = new Option;
       
@@ -18,8 +18,10 @@ class OptionCollection {
 
       $o->name = $p['name'];
       $o->hasValue = $p['hasValue'];
+      if ($o->hasValue) $o->defaultValue = $default;
       $o->description = $description;
       $o->optional = $p['optional'];
+      
       $this->options[] = $o;
    }
 
@@ -28,35 +30,69 @@ class OptionCollection {
       
       return [
          'short' => $pieces[0],
-         'name' => str_replace(':', '', $pieces[1]),
+         'name' => str_replace([':', '?'], '', $pieces[1]),
          'hasValue' => (strpos($option, ':') > -1),
          'optional' => (strpos($option, '?') > -1)
       ];
    }
 
-   public function _dump() {
-         $params = [];
+   public function buildCommand() {
+      $cmd = '';
+      foreach($this->options as $option) {
+         if ($option->optional) $cmd .= '[';
+         $cmd .= " --{$option->name}";
+         if ($option->hasValue)
+         $cmd .= "=<{$option->short}v>";
+         if ($option->optional) $cmd .= '] ';
+      }
+      return $cmd;
+   }
+
+   private function buildOption(Option $option) {
+      $alias = '-'.$option->short;
+      $name = '--'.$option->name;
+      $description = $option->description;
+
+      if ($option->hasValue) {
+         $valk = "{$option->short}v";
+         $alias .= "=<{$valk}>";
+         $name .= "=<{$valk}>";
+
+         if (!is_null($option->defaultValue))
+            $description .= " [default: {$option->defaultValue}]";
+      }
+
+      return [
+         'colunm1' => "$alias $name ",
+         'colunm2' => $description,
+         'c1len' => strlen($alias) + strlen($name) + 1
+      ];
+   }
+
+   public function dumpOptions() {
          $options = [];
-         /**
-          * -h --help     Show this screen.
-          * --version     Show version.
-          * --prod        Build prod
-          * 
+         /*
+           -h --help     Show this screen.
+           --version     Show version.
+           --prod        Build prod
+            --speed=<kn>  Speed in knots [default: 10].
+           
           */
+         $fcs = 0;
          foreach($this->options as $option) {
-            if ($option->hasValue)
-               $params[] = '';
-            
-            // options
-   
-            $short .= $option->short . ($option->hasValue ? ':' : '');
-            $long[] = $option->name . ($option->hasValue ? ':' : '');
+            $o = $this->buildOption($option);
+            $options[] = $o;
+            if ($o['c1len']>$fcs) $fcs = $o['c1len'];
+         }
+
+         $fcs += 3;
+
+         $lines = [];
+         foreach ($options as $option) {
+            $lines[] = $o['colunm1'] . str_repeat(' ', $fcs - $o['c1len']) . $o['colunm2'] . PHP_EOL;
          }
    
-         return [
-            'options' => $short,
-            'longopts' => $long
-         ];
+         return $lines;
    }
 
    public function dump() {

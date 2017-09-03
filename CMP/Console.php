@@ -28,17 +28,35 @@ class Console {
 
    public function run() {
       
-      $command = $this->getCommand();
+      // $command = $this->getCommand();
       
-      if (is_null($command)) return FALSE;
+      // if (is_null($command)) return FALSE;
 
-      $optcll = $command->getOptionCollection();
+      // $optcll = $command->getOptionCollection();
 
-      $opts = $optcll->dump();
+      // $opts = $optcll->dump();
 
-      $args = getopt($opts['options'], $opts['longopts']);
+      // $args = getopt($opts['options'], $opts['longopts']);
 
-      return $command->execute($this, $args);
+      $doc = $this->commands->dump();
+
+      $docopt = \Docopt::handle($doc);
+
+      //  var_dump($docopt);
+
+      if (!empty($docopt->args)) {
+         reset($docopt->args);
+         $cname = key($docopt->args);
+         $command = $this->commands->get($cname);
+         
+         if ($command instanceof Command)
+            $command->execute($this, $docopt->args);
+         else $this->writeln('<error>Command not found</error>'); 
+      } else $this->writeln('<error>Command not found</error>');
+
+      //var_dump($args2);
+
+      // return $command->execute($this, $args);
       
    }
 

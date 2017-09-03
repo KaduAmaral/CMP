@@ -43,8 +43,13 @@ class CommandCollection {
       $commands = 'Usage:'.PHP_EOL;
       $options = 'Options:'.PHP_EOL;
 
-      $args = Docopt::handle($doc, array('version'=>'Naval Fate 2.0'));
-      foreach ($args as $k=>$v)
-         echo $k.': '.json_encode($v).PHP_EOL;
+      foreach ($this->list as $name => $command) {
+         $commands .= "   cmd.php   {$name} " . $command->getOptionCollection()->buildCommand() . PHP_EOL;
+         $options  .= '   '.implode('   '.PHP_EOL, $command->getOptionCollection()->dumpOptions()).PHP_EOL;
+         //buildCommand
       }
+
+      return $commands.PHP_EOL.$options;
+
+   }
 }

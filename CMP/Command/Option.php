@@ -33,6 +33,13 @@ class Option {
    public $hasValue;
 
    /**
+    * Default value when hasValue
+    *
+    * @var mixin
+    */
+    public $defaultValue;
+
+   /**
     * This option is optional?
     *
     * @var boolean
