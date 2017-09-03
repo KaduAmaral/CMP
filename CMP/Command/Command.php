@@ -1,6 +1,6 @@
 <?php
 
-namespace CMP;
+namespace CMP\Command;
 
 use \CMP\Console;
 

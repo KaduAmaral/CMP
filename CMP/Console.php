@@ -2,18 +2,20 @@
 
 namespace CMP;
 
-use \CMP\CommandCollection;
-use \CMP\Command;
-use \CMP\ConsoleUtils;
+use \CMP\Command\CommandCollection;
+use \CMP\Command\Command;
+use \CMP\ConsoleOutput\Formatter;
 
 use \Exception;
 
 class Console {
    
    private $commands;
+   private $formatter;
 
    public function __construct() {
       $this->commands = new CommandCollection();
+      $this->formatter = new Formatter(TRUE);
    }
 
    public function register($name, Command $command) {
@@ -41,7 +43,8 @@ class Console {
    }
 
    public function write($text, $color = NULL, $nl = FALSE) {
-      echo (!is_null($color) ? ConsoleUtils::setColor($text, $color) : $text).PHP_EOL;
+      $text = $this->formatter->format($text);
+      echo $text.($nl?PHP_EOL:'');
    }
 
    public function writeln($text, $color = NULL) {

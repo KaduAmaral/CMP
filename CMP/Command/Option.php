@@ -1,6 +1,6 @@
 <?php
 
-namespace CMP;
+namespace CMP\Command;
 
 class Option {
 
@@ -31,5 +31,12 @@ class Option {
     * @var boolean
     */
    public $hasValue;
+
+   /**
+    * This option is optional?
+    *
+    * @var boolean
+    */
+    public $optional;
 
 }

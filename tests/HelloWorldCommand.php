@@ -1,18 +1,18 @@
 <?php
 namespace tests;
 
-use \CMP\Command;
+use \CMP\Command\Command;
 use \CMP\Console;
-use \CMP\ConsoleUtils;
+use \CMP\ConsoleOutput\FormatterStyle;
 
 class HelloWorldCommand extends Command {
 
    public function execute(Console $console, $args = []) {
-      $console->writeln("Hello World", ConsoleUtils::FG_BLUE);
+      $console->writeln("<red>Hellow Wolrd</red>");
    }
 
    public function getOptionCollection() {
-      return new \CMP\OptionCollection;
+      return new \CMP\Command\OptionCollection;
    }
 
 }
