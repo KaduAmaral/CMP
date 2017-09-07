@@ -26,7 +26,7 @@ class OptionCollection {
    }
 
    private function parseOption($option) {
-      $pieces = explode('|', $option);
+      $pieces = strpos($option, '|') > -1 ? explode('|', $option) : [NULL, $option];
       
       return [
          'short' => $pieces[0],
@@ -37,15 +37,18 @@ class OptionCollection {
    }
 
    public function buildCommand() {
-      $cmd = '';
+      $cmds = [];
       foreach($this->options as $option) {
+         $cmd = '';
          if ($option->optional) $cmd .= '[';
-         $cmd .= " --{$option->name}";
+         $cmd .= "--{$option->name}";
          if ($option->hasValue)
          $cmd .= "=<{$option->short}v>";
          if ($option->optional) $cmd .= '] ';
+
+         $cmds[] = $cmd;
       }
-      return $cmd;
+      return implode(' ', $cmds);
    }
 
    private function buildOption(Option $option) {
