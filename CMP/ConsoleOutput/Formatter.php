@@ -57,10 +57,11 @@ class Formatter {
    public function __construct($decorated = false, array $styles = array()) { 
       $this->decorated = (bool) $decorated;
       $this->setStyle('error', new FormatterStyle('white', 'red'));
-      $this->setStyle('info', new FormatterStyle('green'));
+      $this->setStyle('warning', new FormatterStyle('black', 'yellow'));
+      $this->setStyle('info', new FormatterStyle('cyan'));
+      $this->setStyle('success', new FormatterStyle('green'));
       $this->setStyle('comment', new FormatterStyle('yellow'));
       $this->setStyle('question', new FormatterStyle('black', 'cyan'));
-      $this->setStyle('red', new FormatterStyle('red'));
       foreach ($styles as $name => $style) {
          $this->setStyle($name, $style);
       }
