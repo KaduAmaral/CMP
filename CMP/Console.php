@@ -2,6 +2,8 @@
 
 namespace CMP;
 
+require_once '../vendor/autoload.php';
+
 use \CMP\Command\CommandCollection;
 use \CMP\Command\Command;
 use \CMP\ConsoleOutput\Formatter;
