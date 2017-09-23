@@ -2,6 +2,8 @@
 
 namespace CMP;
 
+require_once '../vendor/autoload.php'; 
+
 use \CMP\Command\CommandCollection;
 use \CMP\Command\Command;
 use \CMP\ConsoleOutput\Formatter;
@@ -20,53 +22,57 @@ class Console {
 
    public function register($name, Command $command) {
       $this->commands->add($name, $command);
+      return $this;
    }
 
    public function alias($name, $alias) {
       $this->commands->alias($name, $alias);
+      return $this;
    }
 
    public function run() {
       
-      // $command = $this->getCommand();
-      
-      // if (is_null($command)) return FALSE;
-
-      // $optcll = $command->getOptionCollection();
-
-      // $opts = $optcll->dump();
-
-      // $args = getopt($opts['options'], $opts['longopts']);
-
       $doc = $this->commands->dump();
 
       $docopt = \Docopt::handle($doc);
 
-      //  var_dump($docopt);
+      if (empty($docopt->args)) {
+         $this->writeln('<error>Command not found</error>');
+         return FALSE;
+      }
+      $cname = null;
+      foreach($docopt->args as $arg => $val) {
+         if (\strpos($arg, '-') === 0)
+            continue;
+         else if ($val === true) {
+            $cname = $arg;
+            break;
+         }
+      }
 
-      if (!empty($docopt->args)) {
-         reset($docopt->args);
-         $cname = key($docopt->args);
-         $command = $this->commands->get($cname);
-         
-         if ($command instanceof Command)
-            $command->execute($this, $docopt->args);
-         else $this->writeln('<error>Command not found</error>'); 
-      } else $this->writeln('<error>Command not found</error>');
+      if (is_null($cname)) {
+         $this->writeln('<error>Command not found</error>');
+         return FALSE;
+      }
 
-      //var_dump($args2);
+      $command = $this->commands->get($cname);
 
-      // return $command->execute($this, $args);
+      if ($command instanceof Command)
+         return $command->execute($this, $docopt->args);
       
+      $this->writeln('<error>Command not found</error>'); 
+      return FALSE;
    }
 
    public function write($text, $color = NULL, $nl = FALSE) {
       $text = $this->formatter->format($text);
       echo $text.($nl?PHP_EOL:'');
+      return $this;
    }
 
    public function writeln($text, $color = NULL) {
       $this->write($text, $color, TRUE);
+      return $this;
    }
 
    public function read($text = '') {
@@ -76,13 +82,8 @@ class Console {
       return $line;
    }
 
-   private function getCommand() {
-      $args = getopt('c:');
-      
-      if (empty($args) || empty($args['c']))
-         throw new Exception('Invalid Command');
-   
-      $command = $this->commands->get($args['c']);
+   public function getCommand($name) {
+      $command = $this->commands->get($name);
 
       if (is_null($command))
          throw new Exception('Command not found');
