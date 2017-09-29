@@ -9,9 +9,10 @@ use \CMP\ConsoleOutput\Formatter;
 use \Exception;
 
 class Console {
-   
+
    private $commands;
    private $formatter;
+   private $share = [];
 
    public function __construct() {
       $this->commands = new CommandCollection();
@@ -28,8 +29,15 @@ class Console {
       return $this;
    }
 
+   public function share($key, $value = NULL) {
+      if (is_null($value) && isset($this->share[$key]))
+        return $this->share[$key];
+      else
+        return $this->share[$key] = $value;
+   }
+
    public function run() {
-      
+
       $doc = $this->commands->dump();
 
       $docopt = \Docopt::handle($doc);
@@ -57,8 +65,8 @@ class Console {
 
       if ($command instanceof Command)
          return $command->execute($this, $docopt->args);
-      
-      $this->writeln('<error>Command not found</error>'); 
+
+      $this->writeln('<error>Command not found</error>');
       return FALSE;
    }
 
